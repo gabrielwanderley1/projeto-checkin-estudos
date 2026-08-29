@@ -1,0 +1,320 @@
+:root {
+    --bg-page: #fdfbf7;
+    --bg-panel: #ffffff;
+    --bg-soft: #faf8f5;
+    --bg-card: #f5f0e6;
+    --text-main: #4a3b32;
+    --text-soft: #6d4c41;
+    --text-muted: #a1887f;
+    --border: #d7ccc8;
+    --accent: #a68a64;
+    --accent-strong: #8c7350;
+    --danger: #d35400;
+    --button-text: #ffffff;
+    --shadow: rgba(74, 59, 50, 0.1);
+}
+
+body.theme-dark {
+    --bg-page: #1f1b1a;
+    --bg-panel: #2a2524;
+    --bg-soft: #332e2d;
+    --bg-card: #3a3432;
+    --text-main: #f3ece7;
+    --text-soft: #d8cfc8;
+    --text-muted: #b9aea7;
+    --border: #5a4f4b;
+    --accent: #8d6e52;
+    --accent-strong: #a98b65;
+    --danger: #f39c5a;
+    --button-text: #f4efe9;
+    --shadow: rgba(0, 0, 0, 0.35);
+}
+
+/* Reset básico para garantir que a página fique igual em todos os navegadores */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Fundo da página bege bem suave com texto marrom escuro */
+body {
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Ocupa 100% da altura da tela */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* O "cartão" branco onde ficam os formulários */
+.container {
+    background-color: var(--bg-panel);
+    padding: 40px;
+    border-radius: 8px; /* Bordas arredondadas */
+    box-shadow: 0 4px 12px var(--shadow);
+    width: 100%;
+    max-width: 400px; /* Não deixa o formulário esticar demais no PC */
+    text-align: center;
+    border-top: 5px solid var(--accent); /* Um detalhe em marrom claro no topo */
+}
+
+h2 {
+    margin-bottom: 10px;
+    color: #3e2723;
+}
+
+p {
+    margin-bottom: 25px;
+    font-size: 14px;
+    color: #6d4c41;
+}
+
+/* Agrupamento dos textos e inputs */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left; /* Mantém os textos de "Usuário" e "Senha" alinhados à esquerda */
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d7ccc8;
+    border-radius: 4px;
+    background-color: #faf8f5;
+    font-size: 16px;
+    color: #4a3b32;
+}
+
+input:focus {
+    outline: none;
+    border-color: #a68a64; /* Muda a borda quando o usuário clica para digitar */
+}
+
+/* Estilo geral de todos os botões */
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Animação suave ao passar o mouse */
+}
+
+/* Botão principal de ação (Entrar/Cadastrar) */
+.btn-primary {
+    background-color: #a68a64; /* Marrom claro elegante */
+    color: white;
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    background-color: #8c7350; /* Fica um pouco mais escuro no mouse hover */
+}
+
+/* Linha visual de "ou" */
+.divider {
+    margin: 20px 0;
+    font-size: 12px;
+    color: #a1887f;
+}
+
+/* Botão secundário de navegação */
+.btn-secondary {
+    background-color: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.btn-secondary:hover {
+    background-color: var(--bg-card);
+}
+
+.btn-theme {
+    width: auto;
+    padding: 8px 14px;
+    font-size: 13px;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* --- ADIÇÕES PARA A TELA PRINCIPAL (STREAK) --- */
+
+.container-large {
+    max-width: 600px; /* Um pouco mais largo para acomodar os 7 dias */
+    padding: 30px;
+}
+
+/* Cabeçalho do usuário */
+.header-user {
+    display: flex;
+    justify-content: space-between; /* Empurra um pra esquerda e outro pra direita */
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+}
+
+.destaque-nome {
+    font-weight: bold;
+    font-size: 18px;
+    color: var(--text-main);
+}
+
+.btn-sair {
+    width: auto;
+    background-color: var(--bg-card); 
+    border: 1px solid var(--border); 
+    color: var(--text-soft); 
+    cursor: pointer;
+    font-size: 12px; 
+    text-decoration: none; 
+    padding: 4px 12px; 
+    border-radius: 4px; 
+    transition: all 0.2s; 
+    display: inline-block; 
+}
+
+.btn-sair:hover {
+    background-color: var(--bg-soft); 
+    border-color: var(--text-muted); 
+}
+
+/* Calendário */
+.calendario-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.seta-nav {
+    background: none;
+    border: none;
+    color: #a68a64;
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 15px;
+    transition: transform 0.2s;
+}
+
+.seta-nav:hover {
+    transform: scale(1.2);
+}
+
+.sequencia-dias {
+    display: flex;
+    gap: 8px; /* Espaço entre os dias */
+}
+
+.dia-card {
+    background-color: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 5px;
+    min-width: 60px;
+    font-size: 14px;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.dia-card:hover {
+    background-color: var(--bg-card);
+}
+
+/* Destacando o dia de hoje */
+.dia-card.hoje {
+    background-color: var(--accent);
+    color: var(--button-text);
+    border-color: var(--accent-strong);
+    font-weight: bold;
+    transform: scale(1.1); /* Deixa o cartão de hoje um pouquinho maior */
+}
+
+/* Display da Streak */
+.streak-container {
+    margin-bottom: 30px;
+}
+
+.streak-numero {
+    font-size: 48px;
+    color: var(--danger); /* Um tom de laranja mais clássico para o fogo */
+    margin-bottom: 5px;
+}
+
+.streak-texto {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-soft);
+}
+
+/* Área de anotações */
+.anotacoes-container {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.anotacoes-container h3 {
+    font-size: 16px;
+    color: var(--text-main);
+    margin-bottom: 10px;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--bg-soft);
+    color: var(--text-main);
+    font-size: 14px;
+    resize: none; /* Impede que o usuário estique a caixa de texto quebrando o layout */
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* Botão de Check-in (usando o estilo base, mas podendo sumir depois) */
+.btn-checkin {
+    font-size: 18px;
+    padding: 15px;
+}
+
+/* --- ADIÇÕES PARA AS NOVAS FUNCIONALIDADES --- */
+
+.mes-display {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--accent);
+    margin-bottom: 10px;
+    text-transform: capitalize; /* Deixa a primeira letra do mês maiúscula */
+}
+
+.streak-maxima {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 5px;
+    font-style: italic; /* Textinho em itálico para diferenciar */
+}
