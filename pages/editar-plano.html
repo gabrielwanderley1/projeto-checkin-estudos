@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in Diário | Editar Plano</title>
+    <!-- Ajuste o caminho do CSS conforme a sua organização de pastas -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="container container-large">
+        
+        <header class="header-user">
+            <div class="destaque-nome">Editar Plano de Estudo</div>
+            <div class="header-actions">
+                <button id="btn-tema" class="btn-secondary btn-theme" type="button">Dark mode</button>
+                <button class="btn-sair" onclick="window.location.href='inicio.html'">Voltar ao Início</button>
+            </div>
+        </header>
+
+        <p style="text-align: left; margin-bottom: 20px;">Adicione, edite ou marque seus tópicos de estudo como concluídos.</p>
+
+        <!-- Esta é a casca onde o JavaScript vai renderizar os inputs -->
+        <div id="container-editor-plano" class="lista-topicos-editor">
+            <!-- Os tópicos aparecerão aqui -->
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="acoes-editor">
+            <button id="btn-add-topico" class="btn-secondary" style="width: auto;">+ Adicionar Novo Tópico</button>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <button id="btn-salvar-plano" class="btn-primary">Salvar Alterações</button>
+        </div>
+
+    </div>
+
+    <script src="../assets/js/editar-plano.js"></script>
+</body>
+</html>

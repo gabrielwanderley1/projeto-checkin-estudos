@@ -211,3 +211,73 @@ function mostrarPopupCheckin() {
 }
 
 renderizarCalendario();
+
+// --- 8. RENDERIZAÇÃO DINÂMICA DO PLANO DE ESTUDO ---
+const containerListaTopicos = document.querySelector('.lista-topicos');
+
+function renderizarPlanoEstudo() {
+    // Limpa o HTML estático de exemplo
+    containerListaTopicos.innerHTML = ''; 
+
+    // Se o plano estiver vazio, mostra uma mensagem amigável
+    if (!conta.planoEstudo || conta.planoEstudo.length === 0) {
+        containerListaTopicos.innerHTML = '<p style="font-size: 14px; color: var(--text-muted); text-align: center; margin-top: 20px;">Nenhum plano cadastrado. Clique no menu para editar.</p>';
+        return;
+    }
+
+    // Passa por cada tópico salvo no banco de dados
+    conta.planoEstudo.forEach((topico, index) => {
+        const checkedTopico = topico.concluido ? 'checked' : '';
+        let subtopicosHTML = '';
+        let temSubtopicos = topico.subtopicos && topico.subtopicos.length > 0;
+
+        // Se houver subtópicos, gera o HTML deles
+        if (temSubtopicos) {
+            subtopicosHTML = `<div class="subtopicos-lista">`;
+            topico.subtopicos.forEach(sub => {
+                const checkedSub = sub.concluido ? 'checked' : '';
+                subtopicosHTML += `
+                    <label class="subtopico-item">
+                        <input type="checkbox" disabled ${checkedSub}> ${sub.titulo}
+                    </label>
+                `;
+            });
+            subtopicosHTML += `</div>`;
+        }
+
+        // A seta só aparece se houver subtópicos
+        const setaHTML = temSubtopicos ? `<span class="seta-dropdown">▼</span>` : `<span class="seta-dropdown" style="display: none;">▼</span>`;
+
+        // Monta o cartão do tópico
+        const htmlTopico = `
+            <div class="topico-item">
+                <div class="topico-cabecalho">
+                    <input type="checkbox" disabled ${checkedTopico}>
+                    <span class="topico-titulo">${index + 1}. ${topico.titulo}</span>
+                    ${setaHTML}
+                </div>
+                ${subtopicosHTML}
+            </div>
+        `;
+
+        // Injeta na tela
+        containerListaTopicos.innerHTML += htmlTopico;
+    });
+
+    // Como recriamos os elementos do zero, precisamos reconectar o evento do clique da sanfona
+    const cabecalhosTopicos = document.querySelectorAll('.topico-cabecalho');
+    cabecalhosTopicos.forEach(cabecalho => {
+        cabecalho.addEventListener('click', function() {
+            const subtopicos = this.nextElementSibling;
+            const seta = this.querySelector('.seta-dropdown');
+
+            if (subtopicos && subtopicos.classList.contains('subtopicos-lista')) {
+                subtopicos.classList.toggle('aberto');
+                seta.classList.toggle('girada');
+            }
+        });
+    });
+}
+
+// Executa a função assim que a tela de início carregar
+renderizarPlanoEstudo();

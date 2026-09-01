@@ -19,7 +19,7 @@ formLogin.addEventListener('submit', function(event) {
         if (usuarioDigitado === conta.usuario && senhaDigitada === conta.senha) {
             alert('Login realizado com sucesso!');
             
-            window.location.href = '../../Streak%20de%20Estudo/pages/principal.html';
+            window.location.href = 'inicio.html';
             
         } else {
             alert('Usuário ou senha incorretos. Tente novamente.');
