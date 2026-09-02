@@ -7,12 +7,10 @@ if (dadosSalvos === null) {
 
 let conta = JSON.parse(dadosSalvos);
 
-// Garante que o usuário tenha um array de plano de estudo salvo na conta
 if (!conta.planoEstudo) {
     conta.planoEstudo = [];
 }
 
-// Lógica do Dark Mode
 const btnTema = document.getElementById('btn-tema');
 function aplicarTema(modoEscuro) {
     document.body.classList.toggle('theme-dark', modoEscuro);
@@ -28,12 +26,13 @@ btnTema.addEventListener('click', function() {
 // --- 2. CONSTRUÇÃO DINÂMICA DO PLANO DE ESTUDO ---
 const containerPlano = document.getElementById('container-editor-plano');
 
-// Função central que injeta um novo cartão de Tópico na tela
 function adicionarTopicoNaTela(titulo = '', concluido = false, subtopicos = []) {
     const card = document.createElement('div');
     card.classList.add('topico-editor-card');
+    
+    // NOVA REGRA: Diz ao navegador que este elemento pode ser arrastado
+    card.setAttribute('draggable', 'true');
 
-    // 2.1. Monta o HTML dos subtópicos, caso existam
     let subtopicosHTML = '';
     subtopicos.forEach(sub => {
         const checkAtributo = sub.concluido ? 'checked' : '';
@@ -46,10 +45,12 @@ function adicionarTopicoNaTela(titulo = '', concluido = false, subtopicos = []) 
         `;
     });
 
-    // 2.2. Monta o HTML do tópico principal
     const checkTopico = concluido ? 'checked' : '';
     card.innerHTML = `
         <div class="linha-topico-input topico-item-dom">
+            <!-- NOVA REGRA: Ícone de alça para arrastar -->
+            <span class="drag-handle" title="Arraste para reordenar">☰</span>
+            
             <input type="checkbox" class="check-topico" ${checkTopico}>
             <input type="text" class="input-titulo-topico" value="${titulo}" placeholder="Nome do tópico (ex: JavaScript, SQL)">
             <button class="btn-icone btn-remover-topico" title="Remover tópico">✖</button>
@@ -60,12 +61,20 @@ function adicionarTopicoNaTela(titulo = '', concluido = false, subtopicos = []) 
         <button class="btn-add-subtopico">+ Adicionar Subtópico</button>
     `;
 
-    // 2.3. Eventos de exclusão (Tópico e Subtópico)
-    card.querySelector('.btn-remover-topico').addEventListener('click', function() {
-        card.remove(); // Remove o cartão inteiro da tela
+    // --- EVENTOS DE DRAG AND DROP DO CARTÃO ---
+    card.addEventListener('dragstart', () => {
+        card.classList.add('dragging'); // Escurece o cartão ao começar a arrastar
     });
 
-    // Usamos 'event delegation' no container de subtópicos para pegar os cliques nos botões '✖'
+    card.addEventListener('dragend', () => {
+        card.classList.remove('dragging'); // Volta ao normal ao soltar
+    });
+    // ------------------------------------------
+
+    card.querySelector('.btn-remover-topico').addEventListener('click', function() {
+        card.remove();
+    });
+
     const containerSub = card.querySelector('.container-subtopicos-editor');
     containerSub.addEventListener('click', function(evento) {
         if (evento.target.classList.contains('btn-remover-subtopico')) {
@@ -73,7 +82,6 @@ function adicionarTopicoNaTela(titulo = '', concluido = false, subtopicos = []) 
         }
     });
 
-    // 2.4. Evento para adicionar um novo subtópico em branco
     card.querySelector('.btn-add-subtopico').addEventListener('click', function() {
         const divSub = document.createElement('div');
         divSub.className = 'linha-subtopico-input subtopico-item-dom';
@@ -82,14 +90,45 @@ function adicionarTopicoNaTela(titulo = '', concluido = false, subtopicos = []) 
             <input type="text" class="input-titulo-subtopico" placeholder="Nome do subtópico...">
             <button class="btn-icone btn-remover-subtopico" title="Remover subtópico">✖</button>
         `;
-        containerSub.appendChild(divSub); // Injerta a nova linha na tela
+        containerSub.appendChild(divSub);
     });
 
     containerPlano.appendChild(card);
 }
 
+// --- LÓGICA DE REORDENAÇÃO (ZONA DE DROP) ---
+// Monitora a área do container enquanto o usuário move o mouse arrastando o cartão
+containerPlano.addEventListener('dragover', (evento) => {
+    evento.preventDefault(); // O navegador por padrão bloqueia drops, isso desativa o bloqueio
+    
+    // Descobre em cima de qual cartão o mouse está no momento
+    const elementoAbaixoDoMouse = obterElementoAbaixo(containerPlano, evento.clientY);
+    const elementoArrastado = document.querySelector('.dragging');
+    
+    if (elementoAbaixoDoMouse == null) {
+        containerPlano.appendChild(elementoArrastado); // Joga pro final se estiver no fim da lista
+    } else {
+        containerPlano.insertBefore(elementoArrastado, elementoAbaixoDoMouse); // Insere antes do cartão focado
+    }
+});
+
+// Função matemática que calcula a posição Y (vertical) do mouse em relação aos cartões
+function obterElementoAbaixo(container, y) {
+    const elementosArrastaveis = [...container.querySelectorAll('.topico-editor-card:not(.dragging)')];
+
+    return elementosArrastaveis.reduce((maisProximo, filho) => {
+        const box = filho.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2; // Pega exatamente o meio do cartão
+        if (offset < 0 && offset > maisProximo.offset) {
+            return { offset: offset, element: filho };
+        } else {
+            return maisProximo;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+// --------------------------------------------
+
 // --- 3. INICIALIZAÇÃO DA TELA ---
-// Se não houver nada salvo, cria um cartão vazio. Se houver, carrega todos.
 if (conta.planoEstudo.length === 0) {
     adicionarTopicoNaTela();
 } else {
@@ -98,7 +137,6 @@ if (conta.planoEstudo.length === 0) {
     });
 }
 
-// Botão geral de adicionar novo tópico
 document.getElementById('btn-add-topico').addEventListener('click', function() {
     adicionarTopicoNaTela();
 });
@@ -108,17 +146,14 @@ document.getElementById('btn-salvar-plano').addEventListener('click', function()
     const cardsNaTela = document.querySelectorAll('.topico-editor-card');
     const novoPlanoEstudo = [];
 
-    // O JavaScript passa por cada cartão visível na tela
     cardsNaTela.forEach(card => {
         const tituloTopico = card.querySelector('.input-titulo-topico').value.trim();
         const concluidoTopico = card.querySelector('.check-topico').checked;
 
-        // Regra: Só vamos salvar tópicos que tenham algum título digitado
         if (tituloTopico !== '') {
             const subtopicos = [];
             const linhasSub = card.querySelectorAll('.subtopico-item-dom');
 
-            // Passa por cada subtópico dentro deste cartão
             linhasSub.forEach(linha => {
                 const tituloSub = linha.querySelector('.input-titulo-subtopico').value.trim();
                 const concluidoSub = linha.querySelector('.check-subtopico').checked;
@@ -131,7 +166,6 @@ document.getElementById('btn-salvar-plano').addEventListener('click', function()
                 }
             });
 
-            // Monta o objeto JSON deste bloco
             novoPlanoEstudo.push({
                 titulo: tituloTopico,
                 concluido: concluidoTopico,
@@ -140,17 +174,16 @@ document.getElementById('btn-salvar-plano').addEventListener('click', function()
         }
     });
 
-    // Sobrescreve o plano antigo no objeto 'conta' e salva no localStorage
     conta.planoEstudo = novoPlanoEstudo;
     localStorage.setItem('minhaConta', JSON.stringify(conta));
 
     mostrarPopupSalvar();
+});
 
-    // --- 5. POP-UP DE SUCESSO CUSTOMIZADO ---
+// --- 5. POP-UP DE SUCESSO CUSTOMIZADO ---
 function mostrarPopupSalvar() {
     const popup = document.createElement('div');
     
-    // Note o uso das variáveis CSS do seu :root para garantir compatibilidade com os temas
     popup.innerHTML = `
         <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000;">
             <div style="background-color: var(--bg-panel); border: 1px solid var(--border); padding: 30px; border-radius: 8px; text-align: center; box-shadow: 0 4px 12px var(--shadow); max-width: 400px; width: 90%;">
@@ -163,4 +196,3 @@ function mostrarPopupSalvar() {
     
     document.body.appendChild(popup);
 }
-});

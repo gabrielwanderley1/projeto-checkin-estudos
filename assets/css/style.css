@@ -45,7 +45,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Ocupa 100% da altura da tela */
+    min-height: 100vh; /* Permite que a página cresça se o conteúdo for muito grande */
+    padding: 40px 20px; /* Adiciona uma "margem de respiro" para não colar nas bordas ao rolar a página */
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -525,4 +526,29 @@ input[type="checkbox"] {
 
 .acoes-editor {
     text-align: left;
+}
+
+/* --- LÓGICA DE DRAG AND DROP --- */
+.drag-handle {
+    cursor: grab;
+    color: var(--text-muted);
+    font-size: 16px;
+    padding-right: 5px;
+    user-select: none; /* Impede que o usuário selecione o ícone como texto sem querer */
+    transition: color 0.2s;
+}
+
+.drag-handle:hover {
+    color: var(--accent);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Efeito visual no cartão que está sendo arrastado no momento */
+.topico-editor-card.dragging {
+    opacity: 0.5;
+    border: 2px dashed var(--accent);
+    background-color: var(--bg-card);
 }
