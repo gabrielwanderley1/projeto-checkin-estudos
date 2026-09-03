@@ -80,7 +80,18 @@ function renderizarCalendario() {
     const containerCalendario = document.getElementById('calendario');
     containerCalendario.innerHTML = '';
 
-    for (let i = -3; i <= 3; i++) {
+    let inicioDias = -3;
+    let fimDias = 3;
+
+    if (window.innerWidth < 600) {
+        inicioDias = -1;
+        fimDias = 1;
+    } else if (window.innerWidth < 950) {
+        inicioDias = -2;
+        fimDias = 2;
+    }
+
+    for (let i = inicioDias; i <= fimDias; i++) {
         const diaLoop = new Date(dataCentroVisualizacao);
         diaLoop.setDate(dataCentroVisualizacao.getDate() + i);
 
@@ -281,3 +292,5 @@ function renderizarPlanoEstudo() {
 
 // Executa a função assim que a tela de início carregar
 renderizarPlanoEstudo();
+
+window.addEventListener('resize', renderizarCalendario);

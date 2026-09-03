@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
+    <script>if(localStorage.getItem('tema') === 'dark') document.body.classList.add('theme-dark');</script>
+    <nav id="menu-lateral" class="sidebar" aria-label="Navegação principal">
+        <a href="inicio.html" class="ativo" aria-current="page">🏠 <span>Início</span></a>
+        <a href="editar-plano.html">📚 <span>Plano de Estudo</span></a>
+        <a href="configuracoes.html">⚙️ <span>Configurações</span></a>
+    </nav>
+
     <!-- Novo container mais largo com layout em Grid -->
     <div class="container container-inicio">
         

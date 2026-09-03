@@ -50,6 +50,70 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+body:has(.sidebar) {
+    padding-left: 250px;
+}
+
+/* Navegação global das páginas autenticadas */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 250px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 30px 16px;
+    background-color: var(--bg-panel);
+    border-right: 1px solid var(--border);
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 4px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar a:hover,
+.sidebar a.ativo {
+    background-color: var(--accent);
+    color: var(--button-text);
+}
+
+@media (max-width: 768px) {
+    body:has(.sidebar) {
+        padding: 84px 20px 40px;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        padding: 10px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar a {
+        flex: 1;
+        justify-content: center;
+        padding: 10px 6px;
+        gap: 5px;
+        font-size: 13px;
+        text-align: center;
+    }
+}
+
 /* O "cartão" branco onde ficam os formulários */
 .container {
     background-color: var(--bg-panel);
@@ -331,6 +395,12 @@ textarea:focus {
     grid-template-columns: 300px 1fr; 
     gap: 40px; 
     align-items: start; 
+}
+
+@media (max-width: 950px) {
+    .container-inicio {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Área do Plano de Estudo */
