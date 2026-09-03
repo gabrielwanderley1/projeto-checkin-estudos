@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in Diário | Configurações</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header-user" style="border-bottom: none; margin-bottom: 20px;">
+            <div class="destaque-nome"></div>
+            <div class="header-actions">
+                <button id="btn-tema" class="btn-secondary btn-theme" type="button">Dark mode</button>
+            </div>
+        </header>
+
+        <div id="view-menu">
+            <h2>Configurações</h2>
+            <p>Gerencie os dados da sua conta.</p>
+
+            <button id="btn-editar-nome" class="btn-secondary" type="button">Alterar nome de usuário</button>
+            <button id="btn-editar-senha" class="btn-secondary" type="button" style="margin-top: 10px;">Alterar senha</button>
+            <button id="btn-voltar-inicio" class="btn-secondary" type="button" style="margin-top: 10px;">Voltar</button>
+            <button id="btn-logout" class="btn-primary" type="button" style="margin-top: 10px;">Sair da conta</button>
+        </div>
+
+        <div id="view-nome" style="display: none;">
+            <h2>Alterar nome de usuário</h2>
+            <p>Informe o novo nome que será usado no login.</p>
+
+            <form id="form-nome">
+                <div class="input-group">
+                    <label for="novo-nome">Novo nome de usuário</label>
+                    <input type="text" id="novo-nome" required>
+                </div>
+                <button class="btn-primary" type="submit">Salvar Alteração</button>
+                <button id="btn-voltar-nome" class="btn-secondary" type="button" style="margin-top: 10px;">Voltar</button>
+            </form>
+        </div>
+
+        <div id="view-senha" style="display: none;">
+            <h2>Alterar senha</h2>
+            <p>Confirme sua senha atual e informe uma nova senha.</p>
+
+            <form id="form-senha">
+                <div class="input-group">
+                    <label for="senha-atual">Senha atual</label>
+                    <input type="password" id="senha-atual" required>
+                </div>
+                <div class="input-group">
+                    <label for="nova-senha">Nova senha</label>
+                    <input type="password" id="nova-senha" required>
+                </div>
+                <button class="btn-primary" type="submit">Salvar Alteração</button>
+                <button id="btn-voltar-senha" class="btn-secondary" type="button" style="margin-top: 10px;">Voltar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../assets/js/configuracoes.js"></script>
+</body>
+</html>

@@ -64,13 +64,13 @@ body {
 
 h2 {
     margin-bottom: 10px;
-    color: #3e2723;
+    color: var(--text-main);
 }
 
 p {
     margin-bottom: 25px;
     font-size: 14px;
-    color: #6d4c41;
+    color: var(--text-soft);
 }
 
 /* Agrupamento dos textos e inputs */
@@ -89,16 +89,16 @@ label {
 input {
     width: 100%;
     padding: 10px;
-    border: 1px solid #d7ccc8;
+    border: 1px solid var(--border);
     border-radius: 4px;
-    background-color: #faf8f5;
+    background-color: var(--bg-soft);
     font-size: 16px;
-    color: #4a3b32;
+    color: var(--text-main);
 }
 
 input:focus {
     outline: none;
-    border-color: #a68a64; /* Muda a borda quando o usuário clica para digitar */
+    border-color: var(--accent); /* Muda a borda quando o usuário clica para digitar */
 }
 
 /* Estilo geral de todos os botões */
@@ -115,20 +115,20 @@ button {
 
 /* Botão principal de ação (Entrar/Cadastrar) */
 .btn-primary {
-    background-color: #a68a64; /* Marrom claro elegante */
-    color: white;
+    background-color: var(--accent); /* Marrom claro elegante */
+    color: var(--button-text);
     margin-top: 10px;
 }
 
 .btn-primary:hover {
-    background-color: #8c7350; /* Fica um pouco mais escuro no mouse hover */
+    background-color: var(--accent-strong); /* Fica um pouco mais escuro no mouse hover */
 }
 
 /* Linha visual de "ou" */
 .divider {
     margin: 20px 0;
     font-size: 12px;
-    color: #a1887f;
+    color: var(--text-muted);
 }
 
 /* Botão secundário de navegação */
@@ -209,7 +209,7 @@ button {
 .seta-nav {
     background: none;
     border: none;
-    color: #a68a64;
+    color: var(--accent);
     font-size: 24px;
     cursor: pointer;
     margin-right: 15px;
