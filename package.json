@@ -1,0 +1,28 @@
+{
+  "name": "streak-de-estudo",
+  "version": "1.0.0",
+  "description": "Projeto desenvolvido com foco em fundamentos robustos de engenharia de software no Front-end, estruturando regras de negócio, responsividade e estado da aplicação como base para a futura integração com um banco de dados relacional (SQL).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielwanderley1/projeto-checkin-estudos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/gabrielwanderley1/projeto-checkin-estudos/issues"
+  },
+  "homepage": "https://github.com/gabrielwanderley1/projeto-checkin-estudos#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/core": "^8.5.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.1"
+  }
+}
