@@ -294,3 +294,17 @@ function renderizarPlanoEstudo() {
 renderizarPlanoEstudo();
 
 window.addEventListener('resize', renderizarCalendario);
+
+document.getElementById('texto-anotacao').addEventListener('blur', function() {
+    const chaveData = formatarDataChave(dataSelecionada);
+
+    if (!conta.checkins[chaveData]) {
+        conta.checkins[chaveData] = {
+            feito: false,
+            anotacao: ''
+        };
+    }
+
+    conta.checkins[chaveData].anotacao = this.value;
+    localStorage.setItem('minhaConta', JSON.stringify(conta));
+});
