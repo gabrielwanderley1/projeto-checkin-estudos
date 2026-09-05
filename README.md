@@ -1,31 +1,52 @@
 # Streak de Estudo | Daily Check-in App
 
-![Demonstração do Projeto](caminho-para-o-seu-gif-ou-imagem.gif) <!-- Substitua por um GIF curto do app funcionando no celular ou PC -->
+![Demonstração do Projeto](caminho-para-o-seu-gif.gif) 
 
-Um aplicativo de gerenciamento de rotina de estudos e rastreamento de ofensivas (streaks). O projeto foi desenhado com foco em fundamentos de front-end, responsividade avançada e arquitetura limpa, operando perfeitamente na web e empacotado de forma nativa para Android.
+Um aplicativo Full-stack de gerenciamento de rotina de estudos e rastreamento de ofensivas (streaks). O projeto foi desenhado com foco em arquitetura limpa, responsividade avançada e persistência em nuvem, operando perfeitamente na web e empacotado de forma nativa para Android.
 
-## Funcionalidades
+## 🚀 Funcionalidades
 
-* **Autenticação e Sessão:** Login e criação de contas baseados em sistema de rotas seguras.
+* **Autenticação Segura:** Sistema de login e cadastro via e-mail utilizando tokens JWT.
 * **Calendário Dinâmico Responsivo:** Adaptação matemática da grade de dias baseada no `window.innerWidth`, garantindo usabilidade em qualquer tamanho de tela.
-* **Plano de Estudos Interativo:** Estrutura de tópicos e subtópicos expansíveis.
-* **Auto-save Silencioso:** Eventos assíncronos garantem que anotações diárias sejam salvas sem a necessidade de cliques adicionais (UX focada em mobile).
-* **Theming Global:** Sistema de Light/Dark Mode estruturado via variáveis CSS (`:root`) com injeção de script bloqueante para prevenção de *Flash of Unstyled Content* (FOUC).
+* **Plano de Estudos Interativo (Drag and Drop):** Estrutura de tópicos e subtópicos expansíveis e reordenáveis.
+* **Auto-save Silencioso & Promise Queue:** Eventos assíncronos salvam anotações no banco de dados sem cliques adicionais. Uma Fila de Promessas (Promise Queue) foi implementada no Front-end para evitar *Race Conditions* (condições de corrida) entre o auto-save e os botões de ação.
+* **Theming Global:** Sistema de Light/Dark Mode estruturado via variáveis CSS e salvo localmente.
 * **Mobile-Ready:** Empacotado como aplicativo Android (.apk) nativo.
 
 ## 🛠 Arquitetura e Tecnologias
 
-Projeto desenvolvido para consolidar fundamentos robustos de engenharia de software no Front-end, estruturando regras de negócio e estado da aplicação como base escalável para uma futura integração com bancos de dados relacionais (SQL).
+O projeto evoluiu de um MVP com armazenamento local para uma arquitetura Client-Server robusta, focada em segurança de dados e performance.
 
-* **Tech Stack:** HTML5, CSS3 e JavaScript Puro (Vanilla ES6+). Sem frameworks.
-* **Gerenciamento de Dados:** Persistência local utilizando `localStorage` e manipulação estruturada via JSON, atuando como um *mock database* arquitetado.
-* **Integração Mobile:** **Capacitor** para encapsulamento WebView, transformando o projeto web em um aplicativo Android nativo.
-* **Padrões de UI/UX:** Navegação em formato Single Page Application (SPA) híbrida via manipulação de DOM (`display: none/block`), modais customizados para retenção de contexto e layouts fluídos (CSS Grid/Flexbox).
+**Front-end:**
+* HTML5, CSS3 e JavaScript Puro (Vanilla ES6+). Sem frameworks.
+* Padrões SPA (Single Page Application) híbrida via manipulação de DOM.
+
+**Back-end & Banco de Dados (BaaS):**
+* **Supabase (PostgreSQL):** Banco de dados relacional para persistência de check-ins, perfis e planos de estudo.
+* **Row Level Security (RLS):** Políticas de segurança configuradas diretamente no banco para garantir que usuários só acessem ou modifiquem seus próprios dados.
+* **Wipe and Replace:** Arquitetura de atualização de dados em massa para o Drag and Drop do Plano de Estudos (utilizando `ON DELETE CASCADE`).
+
+**Mobile:**
+* **Capacitor:** Encapsulamento da aplicação web em uma WebView, compilando o projeto para um APK Android nativo.
 
 ## 🧠 Metodologia (AI-Assisted Development)
 
 Este projeto foi construído utilizando um fluxo moderno de divisão estratégica de papéis com Inteligência Artificial:
-* **Planejamento e Arquitetura:** O **Gemini** foi utilizado como Tech Lead para a engenharia de prompts estruturais, análise de bugs complexos (como invasão de grid e ciclo de renderização), e modelagem do banco de dados simulado.
-* **Execução e Boilerplate:** O **GitHub Copilot** foi encarregado da geração de códigos a partir de escopos estritos.
+* **Tech Lead (Gemini):** Engenharia de prompts estruturais, modelagem do banco de dados relacional (SQL), análise de bugs complexos de grid/concorrência e refatoração arquitetural (migração LocalStorage > Nuvem).
+* **Code Generator (GitHub Copilot):** Geração de blocos de código, boilerplate e tradução das regras de negócio para funções JavaScript ES6+.
 
-Essa abordagem garantiu o controle arquitetural absoluto pelo desenvolvedor, assegurando código limpo, componentização sem bibliotecas externas e resolução de problemas estruturais profundos antes da escrita do código.
+## ⚙️ Como executar o projeto localmente
+
+Como o projeto utiliza ES Modules (`<script type="module">`), ele precisa de um servidor local para rodar no navegador.
+
+1. Clone o repositório:
+   ```bash
+   git clone [https://github.com/seu-usuario/streak-de-estudo.git](https://github.com/seu-usuario/streak-de-estudo.git)
+
+2. Abra a pasta do projeto no VS Code.
+
+3. Instale a extensão Live Server (ou utilize ferramentas como http-server via Node).
+
+4. Clique com o botão direito no arquivo login.html ou cadastro.html e selecione "Open with Live Server".
+
+(Para compilar o APK Android, é necessário ter o Node.js, PNPM, Capacitor e o Android Studio instalados e configurados na máquina).
