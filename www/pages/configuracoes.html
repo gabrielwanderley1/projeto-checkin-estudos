@@ -34,7 +34,7 @@
 
         <div id="view-nome" style="display: none;">
             <h2>Alterar nome de usuário</h2>
-            <p>Informe o novo nome que será usado no login.</p>
+            <p>Informe o novo nome de exibição do seu perfil.</p>
 
             <form id="form-nome">
                 <div class="input-group">
@@ -58,6 +58,11 @@
                 <div class="input-group">
                     <label for="nova-senha">Nova senha</label>
                     <input type="password" id="nova-senha" required>
+                    <ul id="regras-senha" style="font-size: 13px; color: var(--text-muted); margin-top: 8px; padding-left: 20px; text-align: left;">
+                        <li id="regra-tamanho">Mínimo de 6 caracteres</li>
+                        <li id="regra-maiuscula">Pelo menos uma letra maiúscula</li>
+                        <li id="regra-numero">Pelo menos um número</li>
+                    </ul>
                 </div>
                 <button class="btn-primary" type="submit">Salvar Alteração</button>
                 <button id="btn-voltar-senha" class="btn-secondary" type="button" style="margin-top: 10px;">Voltar</button>
@@ -65,6 +70,6 @@
         </div>
     </div>
 
-    <script src="../assets/js/configuracoes.js"></script>
+    <script type="module" src="../assets/js/configuracoes.js"></script>
 </body>
 </html>

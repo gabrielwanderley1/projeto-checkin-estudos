@@ -1,44 +1,8 @@
-const viewMenu = document.getElementById('view-menu');
-const viewNome = document.getElementById('view-nome');
-const viewSenha = document.getElementById('view-senha');
-const btnTema = document.getElementById('btn-tema');
+import { supabase } from './supabase.js';
 
-function aplicarTema(modoEscuro) {
-    document.body.classList.toggle('theme-dark', modoEscuro);
-    btnTema.textContent = modoEscuro ? 'Light mode' : 'Dark mode';
-    localStorage.setItem('tema', modoEscuro ? 'dark' : 'light');
-}
+let usuarioLogado = null;
 
-aplicarTema(localStorage.getItem('tema') === 'dark');
-
-btnTema.addEventListener('click', function() {
-    aplicarTema(!document.body.classList.contains('theme-dark'));
-});
-
-function mostrarView(view) {
-    viewMenu.style.display = 'none';
-    viewNome.style.display = 'none';
-    viewSenha.style.display = 'none';
-    view.style.display = 'block';
-}
-
-function obterConta() {
-    const dadosSalvos = localStorage.getItem('minhaConta');
-
-    if (dadosSalvos === null) {
-        mostrarModal('Nenhuma conta encontrada. Faça o cadastro antes de continuar.', true);
-        return null;
-    }
-
-    try {
-        return JSON.parse(dadosSalvos);
-    } catch (erro) {
-        mostrarModal('Não foi possível carregar os dados da conta.', true);
-        return null;
-    }
-}
-
-function mostrarModal(mensagem, redirecionarParaLogin) {
+function mostrarModal(mensagem, destinoUrl = null) {
     const overlay = document.createElement('div');
     overlay.style.cssText = [
         'position: fixed',
@@ -73,8 +37,8 @@ function mostrarModal(mensagem, redirecionarParaLogin) {
     botao.textContent = 'Ok';
     botao.style.width = '100px';
     botao.addEventListener('click', function() {
-        if (redirecionarParaLogin) {
-            window.location.href = 'login.html';
+        if (destinoUrl) {
+            window.location.href = destinoUrl;
             return;
         }
 
@@ -86,82 +50,154 @@ function mostrarModal(mensagem, redirecionarParaLogin) {
     document.body.appendChild(overlay);
 }
 
-document.getElementById('btn-editar-nome').addEventListener('click', function() {
-    mostrarView(viewNome);
-});
+document.addEventListener('DOMContentLoaded', async () => {
+    const { data: sessaoData, error: sessaoError } = await supabase.auth.getSession();
 
-document.getElementById('btn-editar-senha').addEventListener('click', function() {
-    mostrarView(viewSenha);
-});
-
-document.getElementById('btn-voltar-inicio').addEventListener('click', function() {
-    window.location.href = 'inicio.html';
-});
-
-document.getElementById('btn-voltar-nome').addEventListener('click', function() {
-    mostrarView(viewMenu);
-});
-
-document.getElementById('btn-voltar-senha').addEventListener('click', function() {
-    mostrarView(viewMenu);
-});
-
-document.getElementById('btn-logout').addEventListener('click', function() {
-    mostrarModal('Você saiu da sua conta.', true);
-});
-
-document.getElementById('form-nome').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const novoNome = document.getElementById('novo-nome').value.trim();
-    const conta = obterConta();
-
-    if (conta === null) {
+    if (sessaoError || !sessaoData.session) {
+        window.location.href = 'login.html';
         return;
     }
 
-    if (novoNome === '') {
-        mostrarModal('Informe um nome de usuário válido.', false);
-        return;
+    usuarioLogado = sessaoData.session.user;
+
+    const viewMenu = document.getElementById('view-menu');
+    const viewNome = document.getElementById('view-nome');
+    const viewSenha = document.getElementById('view-senha');
+    const btnTema = document.getElementById('btn-tema');
+
+    function aplicarTema(modoEscuro) {
+        document.body.classList.toggle('theme-dark', modoEscuro);
+        btnTema.textContent = modoEscuro ? 'Light mode' : 'Dark mode';
+        localStorage.setItem('tema', modoEscuro ? 'dark' : 'light');
     }
 
-    if (novoNome === conta.usuario) {
-        mostrarModal('O novo nome deve ser diferente do nome atual.', false);
-        return;
+    aplicarTema(localStorage.getItem('tema') === 'dark');
+
+    btnTema.addEventListener('click', function() {
+        aplicarTema(!document.body.classList.contains('theme-dark'));
+    });
+
+    function mostrarView(view) {
+        viewMenu.style.display = 'none';
+        viewNome.style.display = 'none';
+        viewSenha.style.display = 'none';
+        view.style.display = 'block';
     }
 
-    conta.usuario = novoNome;
-    localStorage.setItem('minhaConta', JSON.stringify(conta));
-    mostrarModal('Nome de usuário alterado com sucesso. Faça login novamente.', true);
-});
+    document.getElementById('btn-editar-nome').addEventListener('click', function() {
+        mostrarView(viewNome);
+    });
 
-document.getElementById('form-senha').addEventListener('submit', function(event) {
-    event.preventDefault();
+    document.getElementById('btn-editar-senha').addEventListener('click', function() {
+        mostrarView(viewSenha);
+    });
 
-    const senhaAtual = document.getElementById('senha-atual').value;
-    const novaSenha = document.getElementById('nova-senha').value;
-    const conta = obterConta();
+    document.getElementById('btn-voltar-inicio').addEventListener('click', function() {
+        window.location.href = 'inicio.html';
+    });
 
-    if (conta === null) {
-        return;
-    }
+    document.getElementById('btn-voltar-nome').addEventListener('click', function() {
+        mostrarView(viewMenu);
+    });
 
-    if (senhaAtual !== conta.senha) {
-        mostrarModal('A senha atual está incorreta.', false);
-        return;
-    }
+    document.getElementById('btn-voltar-senha').addEventListener('click', function() {
+        mostrarView(viewMenu);
+    });
 
-    if (novaSenha.trim() === '') {
-        mostrarModal('Informe uma nova senha válida.', false);
-        return;
-    }
+    const campoNovaSenha = document.getElementById('nova-senha');
+    const regraTamanho = document.getElementById('regra-tamanho');
+    const regraMaiuscula = document.getElementById('regra-maiuscula');
+    const regraNumero = document.getElementById('regra-numero');
 
-    if (novaSenha === conta.senha) {
-        mostrarModal('A nova senha deve ser diferente da senha atual.', false);
-        return;
-    }
+    campoNovaSenha.addEventListener('input', function() {
+        const valor = this.value;
+        const atendeTamanho = valor.length >= 6;
+        const atendeMaiuscula = /[A-Z]/.test(valor);
+        const atendeNumero = /[0-9]/.test(valor);
+        const corAtiva = 'green';
+        const corInativa = 'var(--text-muted)';
 
-    conta.senha = novaSenha;
-    localStorage.setItem('minhaConta', JSON.stringify(conta));
-    mostrarModal('Senha alterada com sucesso. Faça login novamente.', true);
+        regraTamanho.style.color = atendeTamanho ? corAtiva : corInativa;
+        regraMaiuscula.style.color = atendeMaiuscula ? corAtiva : corInativa;
+        regraNumero.style.color = atendeNumero ? corAtiva : corInativa;
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', async function() {
+        const { error } = await supabase.auth.signOut();
+
+        if (error) {
+            console.error('Erro ao sair da conta:', error);
+            mostrarModal('Não foi possível sair da conta.');
+            return;
+        }
+
+        window.location.href = 'login.html';
+    });
+
+    document.getElementById('form-nome').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const novoNome = document.getElementById('novo-nome').value.trim();
+
+        if (novoNome === '') {
+            mostrarModal('Informe um nome de usuário válido.');
+            return;
+        }
+
+        const { error } = await supabase
+            .from('usuarios')
+            .update({ nome_usuario: novoNome })
+            .eq('id', usuarioLogado.id);
+
+        if (error) {
+            console.error('Erro ao atualizar nome:', error);
+            mostrarModal('Não foi possível atualizar o nome.');
+            return;
+        }
+
+        mostrarModal('Nome atualizado com sucesso!', 'inicio.html');
+    });
+
+    document.getElementById('form-senha').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const senhaAtual = document.getElementById('senha-atual').value;
+        const novaSenha = document.getElementById('nova-senha').value;
+
+        if (novaSenha.trim() === '') {
+            mostrarModal('Informe uma nova senha válida.');
+            return;
+        }
+
+        const atendeRequisitos = novaSenha.length >= 6
+            && /[A-Z]/.test(novaSenha)
+            && /[0-9]/.test(novaSenha);
+
+        if (!atendeRequisitos) {
+            mostrarModal('A nova senha não atende a todos os requisitos de segurança.');
+            return;
+        }
+
+        const { error: validacaoError } = await supabase.auth.signInWithPassword({
+            email: usuarioLogado.email,
+            password: senhaAtual
+        });
+
+        if (validacaoError) {
+            mostrarModal('A senha atual está incorreta');
+            return;
+        }
+
+        const { error: atualizacaoError } = await supabase.auth.updateUser({
+            password: novaSenha
+        });
+
+        if (atualizacaoError) {
+            console.error('Erro ao atualizar senha:', atualizacaoError);
+            mostrarModal('Atenção: ' + atualizacaoError.message);
+            return;
+        }
+
+        mostrarModal('Senha alterada com sucesso! Faça login novamente.', 'login.html');
+    });
 });
