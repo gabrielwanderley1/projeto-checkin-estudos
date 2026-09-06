@@ -15,7 +15,7 @@ btnEsqueciSenha.addEventListener('click', async function() {
     const email = campoEmail.value.trim();
 
     if (!email) {
-        alert('Preencha o e-mail para recuperar sua senha.');
+        mostrarModal('Preencha o e-mail para recuperar sua senha.');
         return;
     }
 
@@ -23,14 +23,14 @@ btnEsqueciSenha.addEventListener('click', async function() {
         const { error } = await supabase.auth.resetPasswordForEmail(email);
 
         if (error) {
-            alert(error.message);
+            mostrarModal(error.message);
             return;
         }
 
         modalRecuperacao.style.display = 'flex';
     } catch (err) {
         console.error('Erro ao solicitar recuperação de senha:', err);
-        alert('Ocorreu um erro de conexão com o servidor.');
+        mostrarModal('Ocorreu um erro de conexão com o servidor.');
     }
 });
 
@@ -60,7 +60,7 @@ formRecuperacao.addEventListener('submit', async function(event) {
     const atendeNumero = /[0-9]/.test(novaSenha);
 
     if (!atendeTamanho || !atendeMaiuscula || !atendeNumero) {
-        alert('A senha não atende a todos os requisitos de segurança.');
+        mostrarModal('A senha não atende a todos os requisitos de segurança.');
         return;
     }
 
@@ -72,7 +72,7 @@ formRecuperacao.addEventListener('submit', async function(event) {
         });
 
         if (otpError) {
-            alert(otpError.message);
+            mostrarModal(otpError.message);
             return;
         }
 
@@ -81,16 +81,16 @@ formRecuperacao.addEventListener('submit', async function(event) {
         });
 
         if (updateError) {
-            alert(updateError.message);
+            mostrarModal(updateError.message);
             return;
         }
 
-        alert('Senha alterada com sucesso!');
+        mostrarModal('Senha alterada com sucesso!');
         modalRecuperacao.style.display = 'none';
         await supabase.auth.signOut();
     } catch (err) {
         console.error('Erro ao recuperar senha:', err);
-        alert('Ocorreu um erro de conexão com o servidor.');
+        mostrarModal('Ocorreu um erro de conexão com o servidor.');
     }
 });
 
@@ -112,7 +112,7 @@ formLogin.addEventListener('submit', async function(event) {
         });
 
         if (error) {
-            alert('Erro ao fazer login: E-mail ou senha incorretos.');
+            mostrarModal('Erro ao fazer login: E-mail ou senha incorretos.');
             return;
         }
 
@@ -122,9 +122,33 @@ formLogin.addEventListener('submit', async function(event) {
         
     } catch (err) {
         console.error('Erro inesperado:', err);
-        alert('Ocorreu um erro de conexão com o servidor.');
+        mostrarModal('Ocorreu um erro de conexão com o servidor.');
     } finally {
         btnSubmit.disabled = false;
         btnSubmit.textContent = textoOriginalBotao;
     }
 });
+
+function mostrarModal(mensagem) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position: fixed; inset: 0; z-index: 2000; display: flex; justify-content: center; align-items: center; padding: 20px; background: rgba(0, 0, 0, 0.55);';
+
+    const cartao = document.createElement('div');
+    cartao.style.cssText = 'width: min(100%, 380px); padding: 30px; background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px var(--shadow); text-align: center;';
+
+    const texto = document.createElement('p');
+    texto.textContent = mensagem;
+    texto.style.color = 'var(--text-main)';
+    texto.style.marginBottom = '20px';
+
+    const botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'btn-primary';
+    botao.textContent = 'Ok';
+    botao.style.width = '100px';
+    botao.addEventListener('click', () => overlay.remove());
+
+    cartao.append(texto, botao);
+    overlay.appendChild(cartao);
+    document.body.appendChild(overlay);
+}
