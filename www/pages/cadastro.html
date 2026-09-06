@@ -20,6 +20,11 @@
             <div class="input-group">
                 <label for="new-password">Escolha uma Senha</label>
                 <input type="password" id="new-password" required>
+                <ul id="regras-senha" style="font-size: 13px; color: var(--text-muted, #666); margin-top: 8px; padding-left: 20px; text-align: left;">
+                    <li id="regra-tamanho">Mínimo de 6 caracteres</li>
+                    <li id="regra-maiuscula">Pelo menos uma letra maiúscula</li>
+                    <li id="regra-numero">Pelo menos um número</li>
+                </ul>
             </div>
             <button type="submit" class="btn-primary">Cadastrar</button>
         </form>
