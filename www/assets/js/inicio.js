@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { mostrarModal } from './ui.js';
 
 let perfilUsuario = null;
 
@@ -6,9 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnTema = document.getElementById('btn-tema');
     const textarea = document.getElementById('texto-anotacao');
     const btnCheckin = document.getElementById('btn-checkin');
-    const dataHoje = normalizarData(new Date());
-    let dataCentroVisualizacao = new Date(dataHoje);
-    let dataSelecionada = new Date(dataHoje);
+    let dataCentroVisualizacao = obterDataHojeLocal();
+    let dataSelecionada = obterDataHojeLocal();
 
     const { data: sessaoData, error: sessaoError } = await supabase.auth.getSession();
 
@@ -25,14 +25,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (perfilError) {
         console.error('Erro ao carregar o perfil:', perfilError);
-        alert('Não foi possível carregar seu perfil.');
+        mostrarModal('Não foi possível carregar seu perfil.');
         return;
     }
 
     perfilUsuario = perfil;
     document.getElementById('nome-usuario').innerText = perfilUsuario.nome_usuario;
 
-    await verificarQuebraStreak();
     const temaSalvo = localStorage.getItem('tema');
     aplicarTema(temaSalvo === 'dark');
 
@@ -51,118 +50,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     btnCheckin.addEventListener('click', async () => {
-        const chaveData = formatarDataChave(dataHoje);
-        const anotacao = textarea.value;
-
         btnCheckin.disabled = true;
         textarea.disabled = true;
 
-        const anotacaoSalva = await salvarAnotacaoNoBanco(chaveData, anotacao);
-        if (!anotacaoSalva) {
-            btnCheckin.disabled = false;
-            return;
-        }
-
-        const novaStreak = perfilUsuario.streak_atual + 1;
-        const novoRecorde = Math.max(perfilUsuario.recorde_streak, novaStreak);
-        const { error: perfilUpdateError } = await supabase
-            .from('usuarios')
-            .update({
-                streak_atual: novaStreak,
-                ultimo_checkin: chaveData,
-                recorde_streak: novoRecorde
-            })
-            .eq('id', perfilUsuario.id);
-
-        if (perfilUpdateError) {
-            console.error('Erro ao atualizar a streak:', perfilUpdateError);
-            alert('O check-in foi salvo, mas não foi possível atualizar sua streak.');
-            btnCheckin.disabled = false;
-            return;
-        }
-
-        perfilUsuario.streak_atual = novaStreak;
-        perfilUsuario.recorde_streak = novoRecorde;
-        perfilUsuario.ultimo_checkin = chaveData;
-        atualizarContadores();
-        atualizarPainelAnotacao();
-        mostrarPopupCheckin();
-    });
-
-    textarea.addEventListener('blur', async function() {
-        const chaveData = formatarDataChave(dataSelecionada);
-        await salvarAnotacaoNoBanco(chaveData, this.value);
-    });
-
-    let filaSalvamentoAnotacao = Promise.resolve();
-
-    async function salvarAnotacaoNoBanco(chaveData, texto) {
-        const operacao = filaSalvamentoAnotacao.then(async () => {
-            const { data: checkin, error: buscaError } = await supabase
-                .from('checkins')
-                .select('id')
-                .eq('usuario_id', perfilUsuario.id)
-                .eq('data_registro', chaveData)
-                .maybeSingle();
-
-            if (buscaError) {
-                console.error('Erro ao buscar anotação:', buscaError);
-                alert('Não foi possível salvar a anotação.');
-                return false;
-            }
-
-            const consulta = checkin
-                ? supabase.from('checkins').update({ anotacao: texto }).eq('id', checkin.id)
-                : supabase.from('checkins').insert({
-                    usuario_id: perfilUsuario.id,
-                    data_registro: chaveData,
-                    anotacao: texto
-                });
-            const { error: salvamentoError } = await consulta;
-
-            if (salvamentoError) {
-                console.error('Erro ao salvar anotação:', salvamentoError);
-                alert('Não foi possível salvar a anotação.');
-                return false;
-            }
-
-            return true;
+        const { data, error } = await supabase.rpc('registrar_checkin', {
+            p_usuario_id: perfilUsuario.id,
+            p_anotacao: textarea.value
         });
 
-        filaSalvamentoAnotacao = operacao.catch(() => undefined);
-        return operacao;
-    }
+        if (error) {
+            console.error('Erro ao registrar check-in:', error);
+            mostrarModal('Não foi possível registrar o check-in.');
+            await atualizarPainelAnotacao();
+            btnCheckin.disabled = false;
+            textarea.disabled = false;
+            return;
+        }
+
+        perfilUsuario.streak_atual = data.streak_atual;
+        perfilUsuario.recorde_streak = data.recorde_streak;
+        perfilUsuario.ultimo_checkin = formatarDataChave(obterDataHojeLocal());
+        atualizarContadores();
+        await atualizarPainelAnotacao();
+        mostrarPopupCheckin();
+    });
 
     function aplicarTema(modoEscuro) {
         document.body.classList.toggle('theme-dark', modoEscuro);
         btnTema.textContent = modoEscuro ? 'Light mode' : 'Dark mode';
         localStorage.setItem('tema', modoEscuro ? 'dark' : 'light');
-    }
-
-    async function verificarQuebraStreak() {
-        if (!perfilUsuario.ultimo_checkin) {
-            return;
-        }
-
-        const ultimoCheckin = normalizarData(perfilUsuario.ultimo_checkin);
-        const diferencaDias = Math.floor(
-            (dataHoje.getTime() - ultimoCheckin.getTime()) / (1000 * 3600 * 24)
-        );
-
-        if (diferencaDias > 1) {
-            const { error } = await supabase
-                .from('usuarios')
-                .update({ streak_atual: 0 })
-                .eq('id', perfilUsuario.id);
-
-            if (error) {
-                console.error('Erro ao quebrar a streak:', error);
-                alert('Não foi possível atualizar sua streak.');
-                return;
-            }
-
-            perfilUsuario.streak_atual = 0;
-        }
     }
 
     function formatarDataChave(data) {
@@ -172,15 +88,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `${ano}-${mes}-${dia}`;
     }
 
-    function normalizarData(data) {
-        if (typeof data === 'string') {
-            const [ano, mes, dia] = data.slice(0, 10).split('-').map(Number);
-            return new Date(ano, mes - 1, dia);
-        }
-
-        const resultado = new Date(data);
-        resultado.setHours(0, 0, 0, 0);
-        return resultado;
+    function obterDataHojeLocal() {
+        const dataHoje = new Date();
+        dataHoje.setHours(0, 0, 0, 0);
+        return dataHoje;
     }
 
     function obterNomeDiaSemana(data) {
@@ -193,6 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderizarCalendario() {
+        const dataHoje = obterDataHojeLocal();
         document.getElementById('mes-atual').innerText =
             dataCentroVisualizacao.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
@@ -236,6 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function atualizarPainelAnotacao() {
+        const dataHoje = obterDataHojeLocal();
         const chaveData = formatarDataChave(dataSelecionada);
         const { data: checkin, error } = await supabase
             .from('checkins')
@@ -246,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (error) {
             console.error('Erro ao carregar anotação:', error);
-            alert('Não foi possível carregar a anotação.');
+            mostrarModal('Não foi possível carregar a anotação.');
             return;
         }
 
@@ -266,6 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function mostrarPopupCheckin() {
+        const dataHoje = obterDataHojeLocal();
         const ehFimDeSemana = [0, 6].includes(dataHoje.getDay());
         const mensagem = ehFimDeSemana
             ? 'Um pouco a cada dia e você chega lá! Hoje pode um ARAM de Cartinha, foi merecido!'
@@ -286,6 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderizarCalendario();
     await carregarE_RenderizarPlanoEstudo();
     window.addEventListener('resize', renderizarCalendario);
+    window.addEventListener('focus', renderizarCalendario);
 
     async function carregarE_RenderizarPlanoEstudo() {
         const containerListaTopicos = document.querySelector('.lista-topicos');

@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { mostrarModal } from './ui.js';
 
 let perfilUsuario = null;
 
@@ -129,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (topicosError) {
         console.error('Erro ao carregar plano de estudo:', topicosError);
-        alert('Não foi possível carregar seu plano de estudo.');
+        mostrarModal('Não foi possível carregar seu plano de estudo.');
         return;
     }
 
@@ -158,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (exclusaoError) {
             console.error('Erro ao limpar plano de estudo:', exclusaoError);
-            alert('Não foi possível salvar o plano de estudo.');
+            mostrarModal('Não foi possível salvar o plano de estudo.');
             btnSalvar.disabled = false;
             return;
         }
@@ -186,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (topicoError) {
                 console.error('Erro ao salvar tópico:', topicoError);
-                alert('Não foi possível salvar o plano de estudo.');
+                mostrarModal('Não foi possível salvar o plano de estudo.');
                 btnSalvar.disabled = false;
                 return;
             }
@@ -215,7 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (subtopicosError) {
                     console.error('Erro ao salvar subtópicos:', subtopicosError);
-                    alert('Não foi possível salvar os subtópicos.');
+                    mostrarModal('Não foi possível salvar os subtópicos.');
                     btnSalvar.disabled = false;
                     return;
                 }

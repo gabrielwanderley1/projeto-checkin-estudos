@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { mostrarModal } from './ui.js';
 
 const formCadastro = document.getElementById('register-form');
 const campoSenha = document.getElementById('new-password');
@@ -27,7 +28,7 @@ formCadastro.addEventListener('submit', async function(event) {
     const atendeNumero = /[0-9]/.test(senhaDigitada);
 
     if (!atendeTamanho || !atendeMaiuscula || !atendeNumero) {
-        alert('A senha não atende a todos os requisitos de segurança.');
+        mostrarModal('A senha não atende a todos os requisitos de segurança.');
         return;
     }
 
@@ -43,7 +44,7 @@ formCadastro.addEventListener('submit', async function(event) {
         });
 
         if (error) {
-            alert('Erro ao criar conta: ' + error.message);
+            mostrarModal('Erro ao criar conta: ' + error.message);
             return;
         }
 
@@ -59,7 +60,7 @@ formCadastro.addEventListener('submit', async function(event) {
                 ]);
 
             if (dbError) {
-                alert('Conta criada, mas ocorreu um erro ao salvar o perfil: ' + dbError.message);
+                mostrarModal('Conta criada, mas ocorreu um erro ao salvar o perfil: ' + dbError.message);
                 return;
             }
 
@@ -67,7 +68,7 @@ formCadastro.addEventListener('submit', async function(event) {
         }
     } catch (err) {
         console.error('Erro inesperado:', err);
-        alert('Ocorreu um erro inesperado de conexão.');
+        mostrarModal('Ocorreu um erro inesperado de conexão.');
     } finally {
         btnSubmit.disabled = false;
         btnSubmit.textContent = textoOriginalBotao;

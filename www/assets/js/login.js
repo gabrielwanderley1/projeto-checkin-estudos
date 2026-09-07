@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { mostrarModal } from './ui.js';
 
 const formLogin = document.getElementById('login-form');
 const campoEmail = document.getElementById('login-username');
@@ -10,6 +11,29 @@ const campoOtpNovaSenha = document.getElementById('otp-nova-senha');
 const regraOtpTamanho = document.getElementById('otp-regra-tamanho');
 const regraOtpMaiuscula = document.getElementById('otp-regra-maiuscula');
 const regraOtpNumero = document.getElementById('otp-regra-numero');
+
+function tratarErroSupabase(erroMensagem, origem = 'auth') {
+    
+    const mensagem = erroMensagem.toLowerCase();
+
+    if (mensagem.includes('rate limit')) {
+        return 'Muitas tentativas, aguarde 1 minuto.';
+    }
+
+    if (mensagem.includes('invalid login')) {
+        return 'E-mail ou senha inválidos.';
+    }
+
+    if (mensagem.includes('expired')) {
+        return 'O código expirou. Solicite um novo código.';
+    }
+
+    if (mensagem.includes('invalid otp')) {
+        return 'Código inválido. Verifique o código informado.';
+    }
+
+    return 'Não foi possível concluir a operação. Tente novamente.';
+}
 
 btnEsqueciSenha.addEventListener('click', async function() {
     const email = campoEmail.value.trim();
@@ -23,19 +47,38 @@ btnEsqueciSenha.addEventListener('click', async function() {
         const { error } = await supabase.auth.resetPasswordForEmail(email);
 
         if (error) {
-            mostrarModal(error.message);
+            mostrarModal(tratarErroSupabase(error.message));
             return;
         }
 
+        mostrarModal('Se o e-mail estiver cadastrado, enviaremos as instruções contendo o código.');
         modalRecuperacao.style.display = 'flex';
+        btnEsqueciSenha.disabled = true;
+
+        let segundosRestantes = 60;
+        btnEsqueciSenha.textContent = `Aguarde ${segundosRestantes}s`;
+
+        const intervaloCooldown = setInterval(() => {
+            segundosRestantes -= 1;
+
+            if (segundosRestantes === 0) {
+                clearInterval(intervaloCooldown);
+                btnEsqueciSenha.disabled = false;
+                btnEsqueciSenha.textContent = 'Esqueci minha senha';
+                return;
+            }
+
+            btnEsqueciSenha.textContent = `Aguarde ${segundosRestantes}s`;
+        }, 1000);
     } catch (err) {
         console.error('Erro ao solicitar recuperação de senha:', err);
-        mostrarModal('Ocorreu um erro de conexão com o servidor.');
+        mostrarModal(tratarErroSupabase('connection error', 'reset'));
     }
 });
 
-btnFecharRecuperacao.addEventListener('click', function() {
+btnFecharRecuperacao.addEventListener('click', async function() {
     modalRecuperacao.style.display = 'none';
+    await supabase.auth.signOut();
 });
 
 campoOtpNovaSenha.addEventListener('input', function() {
@@ -55,6 +98,12 @@ formRecuperacao.addEventListener('submit', async function(event) {
     const email = campoEmail.value.trim();
     const codigoDigitado = document.getElementById('otp-codigo').value.trim();
     const novaSenha = campoOtpNovaSenha.value;
+
+    if (!/^\d{8}$/.test(codigoDigitado)) {
+        mostrarModal('Digite um código válido com exatamente 8 dígitos numéricos.');
+        return;
+    }
+
     const atendeTamanho = novaSenha.length >= 6;
     const atendeMaiuscula = /[A-Z]/.test(novaSenha);
     const atendeNumero = /[0-9]/.test(novaSenha);
@@ -72,7 +121,7 @@ formRecuperacao.addEventListener('submit', async function(event) {
         });
 
         if (otpError) {
-            mostrarModal(otpError.message);
+            mostrarModal(tratarErroSupabase(otpError.message));
             return;
         }
 
@@ -81,7 +130,9 @@ formRecuperacao.addEventListener('submit', async function(event) {
         });
 
         if (updateError) {
-            mostrarModal(updateError.message);
+            mostrarModal('A validação foi feita, mas não foi possível atualizar sua senha. Por favor, solicite um novo código.');
+            await supabase.auth.signOut();
+            modalRecuperacao.style.display = 'none';
             return;
         }
 
@@ -112,7 +163,7 @@ formLogin.addEventListener('submit', async function(event) {
         });
 
         if (error) {
-            mostrarModal('Erro ao fazer login: E-mail ou senha incorretos.');
+            mostrarModal(tratarErroSupabase(error.message));
             return;
         }
 
@@ -128,27 +179,3 @@ formLogin.addEventListener('submit', async function(event) {
         btnSubmit.textContent = textoOriginalBotao;
     }
 });
-
-function mostrarModal(mensagem) {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position: fixed; inset: 0; z-index: 2000; display: flex; justify-content: center; align-items: center; padding: 20px; background: rgba(0, 0, 0, 0.55);';
-
-    const cartao = document.createElement('div');
-    cartao.style.cssText = 'width: min(100%, 380px); padding: 30px; background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px var(--shadow); text-align: center;';
-
-    const texto = document.createElement('p');
-    texto.textContent = mensagem;
-    texto.style.color = 'var(--text-main)';
-    texto.style.marginBottom = '20px';
-
-    const botao = document.createElement('button');
-    botao.type = 'button';
-    botao.className = 'btn-primary';
-    botao.textContent = 'Ok';
-    botao.style.width = '100px';
-    botao.addEventListener('click', () => overlay.remove());
-
-    cartao.append(texto, botao);
-    overlay.appendChild(cartao);
-    document.body.appendChild(overlay);
-}
