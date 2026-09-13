@@ -143,6 +143,14 @@ p {
     text-align: left; /* Mantém os textos de "Usuário" e "Senha" alinhados à esquerda */
 }
 
+.checkbox-container {
+    margin-bottom: 15px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 label {
     display: block;
     margin-bottom: 5px;
@@ -482,7 +490,6 @@ textarea:focus {
 input[type="checkbox"] {
     width: 16px;
     height: 16px;
-    cursor: not-allowed; /* Mostra o ícone de bloqueado ao passar o mouse */
     accent-color: var(--accent); /* Pinta o checkbox preenchido com a sua cor de destaque */
 }
 

@@ -12,6 +12,11 @@ const regraOtpTamanho = document.getElementById('otp-regra-tamanho');
 const regraOtpMaiuscula = document.getElementById('otp-regra-maiuscula');
 const regraOtpNumero = document.getElementById('otp-regra-numero');
 
+if (localStorage.getItem('email') !== null) {
+    campoEmail.value = localStorage.getItem('email');
+    document.getElementById('check-email').checked = true;
+};
+
 function tratarErroSupabase(erroMensagem, origem = 'auth') {
     
     const mensagem = erroMensagem.toLowerCase();
@@ -147,6 +152,11 @@ formRecuperacao.addEventListener('submit', async function(event) {
 
 formLogin.addEventListener('submit', async function(event) {
     event.preventDefault();
+    if (document.getElementById('check-email').checked) {
+        localStorage.setItem('email', campoEmail.value);
+    } else {
+        localStorage.removeItem('email');
+    }
 
     const emailDigitado = campoEmail.value;
     const senhaDigitada = document.getElementById('password').value;

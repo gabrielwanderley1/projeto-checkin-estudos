@@ -13,20 +13,30 @@
         <p>Faça login para registrar seu dia de estudo.</p>
 
         <form id="login-form">
+            
             <div class="input-group">
                 <label for="login-username">E-mail</label>
                 <input type="email" id="login-username" required>
             </div>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="check-email" ${checkAtributo}>
+                <label for="check-email">Lembrar de mim</label>
+            </div>
+
             <div class="input-group">
                 <label for="password">Senha</label>
                 <input type="password" id="password" required>
             </div>
+
             <button type="submit" class="btn-primary">Entrar</button>
+
             <div style="display: flex; justify-content: center; margin-top: 15px; margin-bottom: 20px;">
                 <button type="button" id="btn-esqueci-senha" style="width: auto; background: none; border: none; color: var(--accent); font-size: 14px; cursor: pointer; text-decoration: underline; padding: 8px 0;">
                     Esqueci minha senha
                 </button>
             </div>
+
         </form>
         
         <div class="divider">ou</div>
