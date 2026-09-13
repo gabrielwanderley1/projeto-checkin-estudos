@@ -40,13 +40,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.getElementById('btn-voltar-dias').addEventListener('click', () => {
-        dataCentroVisualizacao.setDate(dataCentroVisualizacao.getDate() - 7);
-        renderizarCalendario();
+        if (window.innerWidth < 600) {
+            dataCentroVisualizacao.setDate(dataCentroVisualizacao.getDate() - 3)
+            renderizarCalendario();
+        } else if (window.innerWidth < 950) {
+            dataCentroVisualizacao.setDate(dataCentroVisualizacao.getDate() - 5);
+            renderizarCalendario();
+        }
     });
 
     document.getElementById('btn-avancar-dias').addEventListener('click', () => {
-        dataCentroVisualizacao.setDate(dataCentroVisualizacao.getDate() + 7);
-        renderizarCalendario();
+        if (window.innerWidth < 600) {
+            dataCentroVisualizacao.setDate(dataCentroVisualizacao.getDate() + 3);
+            renderizarCalendario();
+        } else if (window.innerWidth < 950) {
+            dataCentroVisualizacao.setDate(dataCentroVisualizacao.getDate() + 5);
+            renderizarCalendario();
+        }
     });
 
     btnCheckin.addEventListener('click', async () => {
